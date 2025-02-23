@@ -180,16 +180,18 @@
             await setQuestionImage();
             correctAnswer = selectedCategory;
             const wrongAnswers = allCategories.filter(cat => cat !== correctAnswer);
-            const wrongAnswer = wrongAnswers[Math.floor(Math.random() * 3)];
+            const wrongAnswer = wrongAnswers[Math.floor(Math.random() * wrongAnswers.length)];
             const choices = [correctAnswer, wrongAnswer];
-            choices.sort(() => Math.random() - 0.5);
-            document.getElementById('choice1').textContent = choices[0];
-            document.getElementById('choice2').textContent = choices[1];
+            // 選択肢をシャッフル
+            const shuffledChoices = choices.sort(() => Math.random() - 0.5);
+            document.getElementById('choice1').textContent = shuffledChoices[0];
+            document.getElementById('choice2').textContent = shuffledChoices[1];
             // 選択肢を再有効化
             document.getElementById('choice1').disabled = false;
             document.getElementById('choice2').disabled = false;
             let timeLeft = 5;
             document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
+            clearInterval(timer);  // 既存のタイマーをクリア
             timer = setInterval(() => {
                 timeLeft--;
                 if (timeLeft >= 0) {
@@ -201,6 +203,7 @@
                     nextQuestion();
                 }
             }, 1000);
+            // 5秒後に選択肢を無効化
             setTimeout(() => {
                 document.getElementById('choice1').disabled = true;
                 document.getElementById('choice2').disabled = true;
@@ -212,7 +215,7 @@
             if (selected === correctAnswer) {
                 score++;
             }
-            // 選択肢を無効化
+            // 次の問題へ移る前に選択肢を無効化
             document.getElementById('choice1').disabled = true;
             document.getElementById('choice2').disabled = true;
             nextQuestion();
