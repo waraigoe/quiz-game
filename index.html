@@ -5,7 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QUIZ! OHTANISAN</title>
     <style>
-        /* スタイルは省略 */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        #start-screen, #game-screen, #result-screen {
+            display: none;
+        }
+        #start-screen {
+            display: block;
+        }
+        #start-button {
+            font-size: 24px;
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #start-button:hover {
+            background-color: #45a049;
+        }
+        #game-screen img, #result-screen img, #start-screen img {
+            width: 300px;
+            height: 300px;
+            margin: 20px 0;
+        }
+        #choices button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #timer {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        #back-to-start {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #back-to-start:hover {
+            background-color: #007399;
+        }
     </style>
 </head>
 <body>
@@ -147,8 +205,11 @@
             }, 1000);
             // 5秒後に選択肢を無効化
             setTimeout(() => {
-                document.getElementById('choice1').disabled = true;
-                document.getElementById('choice2').disabled = true;
+                if (!document.getElementById('choice1').disabled) {
+                    document.getElementById('choice1').disabled = true;
+                    document.getElementById('choice2').disabled = true;
+                    nextQuestion();
+                }
             }, 5000);
         }
 
