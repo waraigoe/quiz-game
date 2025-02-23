@@ -14,7 +14,11 @@ let selectedAnswer = null;
 function setStartImage() {
     const ohtaniImages = images.OHTANISAN;
     const randomIndex = Math.floor(Math.random() * ohtaniImages.length);
-    document.getElementById('start-image').src = ohtaniImages[randomIndex];
+    const startImage = document.getElementById('start-image');
+    startImage.src = ohtaniImages[randomIndex] + '?t=' + Date.now(); // キャッシュ無効化
+    startImage.onload = () => {
+        // 画像読み込み完了後に何か処理を行う場合はここに書く
+    };
 }
 
 function generateQuestion() {
@@ -22,7 +26,7 @@ function generateQuestion() {
     const correctAnswer = answers[randomAnswerIndex];
     const imageList = images[correctAnswer];
     const randomImageIndex = Math.floor(Math.random() * imageList.length);
-    const imageSrc = imageList[randomImageIndex];
+    const imageSrc = imageList[randomImageIndex] + '?t=' + Date.now(); // キャッシュ無効化
 
     let wrongAnswer;
     do {
@@ -38,12 +42,17 @@ function showQuiz() {
     document.getElementById('quiz-screen').style.display = 'block';
 
     const question = generateQuestion();
-    document.getElementById('quiz-image').src = question.imageSrc;
-    document.getElementById('option1').textContent = question.options[0];
-    document.getElementById('option2').textContent = question.options[1];
-
-    selectedAnswer = null;
-    startTimer(question.correctAnswer);
+    const quizImage = document.getElementById('quiz-image');
+    quizImage.src = question.imageSrc;
+    quizImage.onload = () => {
+        document.getElementById('option1').textContent = question.options[0];
+        document.getElementById('option2').textContent = question.options[1];
+        selectedAnswer = null;
+        startTimer(question.correctAnswer);
+    };
+    quizImage.onerror = () => {
+        console.error('画像の読み込みに失敗しました: ' + question.imageSrc);
+    };
 }
 
 function startTimer(correctAnswer) {
@@ -82,7 +91,11 @@ function showResult() {
 
     const allImages = [...images.OHTANISAN, ...images.MIZUTANISAN, ...images.ELONSAN, ...images.TRUMPSAN];
     const randomImageIndex = Math.floor(Math.random() * allImages.length);
-    document.getElementById('result-image').src = allImages[randomImageIndex];
+    const resultImage = document.getElementById('result-image');
+    resultImage.src = allImages[randomImageIndex] + '?t=' + Date.now(); // キャッシュ無効化
+    resultImage.onload = () => {
+        // 画像読み込み完了後に何か処理を行う場合はここに書く
+    };
 }
 
 document.getElementById('start-button').addEventListener('click', () => {
