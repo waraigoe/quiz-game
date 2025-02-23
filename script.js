@@ -10,14 +10,18 @@ let currentQuestion = 0;
 let score = 0;
 let timer;
 let selectedAnswer = null;
+const bgm = document.getElementById('bgm');
 
 function setStartImage() {
     const ohtaniImages = images.OHTANISAN;
     const randomIndex = Math.floor(Math.random() * ohtaniImages.length);
     const startImage = document.getElementById('start-image');
-    startImage.src = ohtaniImages[randomIndex] + '?t=' + Date.now(); // キャッシュ無効化
+    startImage.src = ohtaniImages[randomIndex] + '?t=' + Date.now();
     startImage.onload = () => {
         // 画像読み込み完了後に何か処理を行う場合はここに書く
+    };
+    startImage.onerror = () => {
+        console.error('スタート画面の画像の読み込みに失敗しました: ' + startImage.src);
     };
 }
 
@@ -26,7 +30,7 @@ function generateQuestion() {
     const correctAnswer = answers[randomAnswerIndex];
     const imageList = images[correctAnswer];
     const randomImageIndex = Math.floor(Math.random() * imageList.length);
-    const imageSrc = imageList[randomImageIndex] + '?t=' + Date.now(); // キャッシュ無効化
+    const imageSrc = imageList[randomImageIndex] + '?t=' + Date.now();
 
     let wrongAnswer;
     do {
@@ -51,7 +55,7 @@ function showQuiz() {
         startTimer(question.correctAnswer);
     };
     quizImage.onerror = () => {
-        console.error('画像の読み込みに失敗しました: ' + question.imageSrc);
+        console.error('出題中の画像の読み込みに失敗しました: ' + question.imageSrc);
     };
 }
 
@@ -92,16 +96,22 @@ function showResult() {
     const allImages = [...images.OHTANISAN, ...images.MIZUTANISAN, ...images.ELONSAN, ...images.TRUMPSAN];
     const randomImageIndex = Math.floor(Math.random() * allImages.length);
     const resultImage = document.getElementById('result-image');
-    resultImage.src = allImages[randomImageIndex] + '?t=' + Date.now(); // キャッシュ無効化
+    resultImage.src = allImages[randomImageIndex] + '?t=' + Date.now();
     resultImage.onload = () => {
         // 画像読み込み完了後に何か処理を行う場合はここに書く
+    };
+    resultImage.onerror = () => {
+        console.error('結果画面の画像の読み込みに失敗しました: ' + resultImage.src);
     };
 }
 
 document.getElementById('start-button').addEventListener('click', () => {
     setStartImage();
     showQuiz();
-    document.getElementById('bgm').play();
+    // BGMを再生（ユーザーのクリックイベント内で実行）
+    bgm.play().catch(error => {
+        console.error('BGMの再生に失敗しました:', error);
+    });
 });
 
 document.getElementById('option1').addEventListener('click', () => {
