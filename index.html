@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,30 +69,30 @@
 <body>
     <audio id="bgm" loop autoplay>
         <source src="bgm.mp3" type="audio/mpeg">
-        あなたのブラウザはオーディオ要素をサポートしていません。
+        Your browser does not support the audio element.
     </audio>
 
     <div id="start-screen">
         <h1>QUIZ! OHTANISAN</h1>
-        <p>クイズゲームへようこそ！異なる人物の画像が表示され、2つの選択肢から正しい人物を選びます。各問題には5秒の制限時間があり、全10問です。頑張ってください！</p>
+        <p>Welcome to the quiz game! You will be shown images of different people, and you have to choose who it is from two options. You have 5 seconds to answer each question. There are 10 questions in total. Good luck!</p>
         <img id="start-image" src="" alt="OHTANISAN">
-        <button id="start-button">スタート</button>
+        <button id="start-button">START</button>
     </div>
 
     <div id="game-screen">
-        <img id="question-image" src="" alt="問題画像">
+        <img id="question-image" src="" alt="Question Image">
         <div id="choices">
             <button id="choice1"></button>
             <button id="choice2"></button>
         </div>
-        <div id="timer">残り時間: 5秒</div>
+        <div id="timer">Time left: 5s</div>
     </div>
 
     <div id="result-screen">
-        <h2>結果</h2>
-        <p>あなたのスコア: <span id="score"></span>/10</p>
-        <img id="result-image" src="" alt="結果画像">
-        <button id="back-to-start">スタートに戻る</button>
+        <h2>Result</h2>
+        <p>Your score: <span id="score"></span>/10</p>
+        <img id="result-image" src="" alt="Result Image">
+        <button id="back-to-start">Back to Start</button>
     </div>
 
     <script>
@@ -111,23 +111,24 @@
         let selectedCategory;
         let selectedImage;
         let correctAnswer;
+        let timeLeft = 5;
 
         const bgm = document.getElementById('bgm');
         bgm.play().catch(error => {
-            console.log("BGM再生に失敗しました:", error);
+            console.log("Failed to play BGM:", error);
         });
 
-        // 画像をプリロードする関数
+        // Function to preload images
         function preloadImage(url) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.src = url;
                 img.onload = () => resolve(img);
-                img.onerror = () => reject(new Error(`画像の読み込みに失敗しました: ${url}`));
+                img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
             });
         }
 
-        // スタート画面の画像を設定
+        // Set start screen image
         async function setStartImage() {
             const ohtaniImages = categories['OHTANISAN'];
             const randomOhtaniImage = ohtaniImages[Math.floor(Math.random() * 5)];
@@ -139,7 +140,7 @@
             }
         }
 
-        // ゲーム画面の画像を設定
+        // Set question image
         async function setQuestionImage() {
             selectedCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
             selectedImage = categories[selectedCategory][Math.floor(Math.random() * 5)];
@@ -151,7 +152,7 @@
             }
         }
 
-        // 結果画面の画像を設定
+        // Set result screen image
         async function setResultImage() {
             const randomCategory = allCategories[Math.floor(Math.random() * 4)];
             const randomImage = categories[randomCategory][Math.floor(Math.random() * 5)];
@@ -187,19 +188,19 @@
             document.getElementById('choice2').textContent = shuffledChoices[1];
             document.getElementById('choice1').disabled = false;
             document.getElementById('choice2').disabled = false;
-            let timeLeft = 5;
-            document.getElementById('timer').textContent = `残り時間: ${timeLeft}秒`;
-            clearTimeout(timerId);  // 既存のタイマーをクリア
+            timeLeft = 5;
+            document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
+            clearTimeout(timerId);
             timerId = setTimeout(() => {
                 document.getElementById('choice1').disabled = true;
                 document.getElementById('choice2').disabled = true;
                 nextQuestion();
             }, 5000);
-            // タイマー表示
+            // Update timer display every second
             const timerDisplay = setInterval(() => {
                 timeLeft--;
                 if (timeLeft >= 0) {
-                    document.getElementById('timer').textContent = `残り時間: ${timeLeft}秒`;
+                    document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
                 } else {
                     clearInterval(timerDisplay);
                 }
@@ -207,7 +208,7 @@
         }
 
         function checkAnswer(selected) {
-            clearTimeout(timerId);  // タイマーをクリア
+            clearTimeout(timerId);
             if (selected === correctAnswer) {
                 score++;
             }
