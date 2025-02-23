@@ -185,6 +185,7 @@
             choices.sort(() => Math.random() - 0.5);
             document.getElementById('choice1').textContent = choices[0];
             document.getElementById('choice2').textContent = choices[1];
+            // 選択肢を再有効化
             document.getElementById('choice1').disabled = false;
             document.getElementById('choice2').disabled = false;
             let timeLeft = 5;
@@ -211,6 +212,9 @@
             if (selected === correctAnswer) {
                 score++;
             }
+            // 選択肢を無効化
+            document.getElementById('choice1').disabled = true;
+            document.getElementById('choice2').disabled = true;
             nextQuestion();
         }
 
