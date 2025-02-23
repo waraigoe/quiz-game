@@ -189,7 +189,7 @@
             document.getElementById('choice2').disabled = false;
             let timeLeft = 5;
             document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
-            clearInterval(timer);
+            clearInterval(timer);  // 既存のタイマーをクリア
             timer = setInterval(() => {
                 timeLeft--;
                 if (timeLeft >= 0) {
@@ -201,6 +201,7 @@
                     nextQuestion();
                 }
             }, 1000);
+            // 5秒後に選択肢を無効化
             setTimeout(() => {
                 if (!document.getElementById('choice1').disabled) {
                     document.getElementById('choice1').disabled = true;
@@ -211,7 +212,7 @@
         }
 
         function checkAnswer(selected) {
-            clearInterval(timer);
+            clearInterval(timer);  // タイマーをクリア
             if (selected === correctAnswer) {
                 score++;
             }
