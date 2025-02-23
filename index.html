@@ -67,14 +67,14 @@
     </style>
 </head>
 <body>
-    <audio id="bgm" loop>
+    <audio id="bgm" loop autoplay>
         <source src="bgm.mp3" type="audio/mpeg">
         あなたのブラウザはオーディオ要素をサポートしていません。
     </audio>
 
     <div id="start-screen">
         <h1>QUIZ! OHTANISAN</h1>
-        <p>Welcome to the quiz game! You will be shown images of different people, and you have to choose who it is from two options. You have 2 seconds to answer each question. There are 10 questions in total. Good luck!</p>
+        <p>Welcome to the quiz game! You will be shown images of different people, and you have to choose who it is from two options. You have 5 seconds to answer each question. There are 10 questions in total. Good luck!</p>
         <img id="start-image" src="" alt="OHTANISAN">
         <button id="start-button">START</button>
     </div>
@@ -85,7 +85,7 @@
             <button id="choice1"></button>
             <button id="choice2"></button>
         </div>
-        <div id="timer">Time left: 2s</div>
+        <div id="timer">Time left: 5s</div>
     </div>
 
     <div id="result-screen">
@@ -113,7 +113,55 @@
         let correctAnswer;
 
         const bgm = document.getElementById('bgm');
-        bgm.play();
+        bgm.play().catch(error => {
+            console.log("BGM再生に失敗しました:", error);
+        });
+
+        // 画像をプリロードする関数
+        function preloadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = url;
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error(`画像の読み込みに失敗しました: ${url}`));
+            });
+        }
+
+        // スタート画面の画像を設定
+        async function setStartImage() {
+            const ohtaniImages = categories['OHTANISAN'];
+            const randomOhtaniImage = ohtaniImages[Math.floor(Math.random() * 5)];
+            try {
+                await preloadImage(randomOhtaniImage);
+                document.getElementById('start-image').src = randomOhtaniImage;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // ゲーム画面の画像を設定
+        async function setQuestionImage() {
+            selectedCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
+            selectedImage = categories[selectedCategory][Math.floor(Math.random() * 5)];
+            try {
+                await preloadImage(selectedImage);
+                document.getElementById('question-image').src = selectedImage;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // 結果画面の画像を設定
+        async function setResultImage() {
+            const randomCategory = allCategories[Math.floor(Math.random() * 4)];
+            const randomImage = categories[randomCategory][Math.floor(Math.random() * 5)];
+            try {
+                await preloadImage(randomImage);
+                document.getElementById('result-image').src = randomImage;
+            } catch (error) {
+                console.error(error);
+            }
+        }
 
         function startGame() {
             document.getElementById('start-screen').style.display = 'none';
@@ -123,31 +171,23 @@
             nextQuestion();
         }
 
-        function nextQuestion() {
+        async function nextQuestion() {
             if (currentQuestion >= 10) {
                 showResult();
                 return;
             }
             currentQuestion++;
-            // ランダムにカテゴリを選ぶ
-            selectedCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
-            // そのカテゴリからランダムに画像を選ぶ
-            selectedImage = categories[selectedCategory][Math.floor(Math.random() * 5)];
-            document.getElementById('question-image').src = selectedImage;
-            // 選択肢を生成
+            await setQuestionImage();
             correctAnswer = selectedCategory;
             const wrongAnswers = allCategories.filter(cat => cat !== correctAnswer);
             const wrongAnswer = wrongAnswers[Math.floor(Math.random() * 3)];
             const choices = [correctAnswer, wrongAnswer];
-            // 選択肢をシャッフル
             choices.sort(() => Math.random() - 0.5);
             document.getElementById('choice1').textContent = choices[0];
             document.getElementById('choice2').textContent = choices[1];
-            // ボタンを有効化
             document.getElementById('choice1').disabled = false;
             document.getElementById('choice2').disabled = false;
-            // タイマーを設定
-            let timeLeft = 2;
+            let timeLeft = 5;
             document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
             timer = setInterval(() => {
                 timeLeft--;
@@ -155,18 +195,15 @@
                     document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
                 } else {
                     clearInterval(timer);
-                    // 時間切れで選択肢を無効化
                     document.getElementById('choice1').disabled = true;
                     document.getElementById('choice2').disabled = true;
-                    // 次の問題へ
                     nextQuestion();
                 }
             }, 1000);
-            // 2秒後に選択肢を無効化
             setTimeout(() => {
                 document.getElementById('choice1').disabled = true;
                 document.getElementById('choice2').disabled = true;
-            }, 2000);
+            }, 5000);
         }
 
         function checkAnswer(selected) {
@@ -174,27 +211,20 @@
             if (selected === correctAnswer) {
                 score++;
             }
-            // 次の問題へ
             nextQuestion();
         }
 
-        function showResult() {
+        async function showResult() {
             document.getElementById('game-screen').style.display = 'none';
             document.getElementById('result-screen').style.display = 'block';
             document.getElementById('score').textContent = score;
-            // 結果画面にランダムな画像を表示
-            const randomCategory = allCategories[Math.floor(Math.random() * 4)];
-            const randomImage = categories[randomCategory][Math.floor(Math.random() * 5)];
-            document.getElementById('result-image').src = randomImage;
+            await setResultImage();
         }
 
         function backToStart() {
             document.getElementById('result-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'block';
-            // スタート画面にランダムなOHTANISAN画像を設定
-            const ohtaniImages = categories['OHTANISAN'];
-            const randomOhtaniImage = ohtaniImages[Math.floor(Math.random() * 5)];
-            document.getElementById('start-image').src = randomOhtaniImage;
+            setStartImage();
         }
 
         // イベントリスナーを設定
@@ -212,7 +242,7 @@
         document.getElementById('back-to-start').addEventListener('click', backToStart);
 
         // 初回スタート画面にランダムなOHTANISAN画像を設定
-        backToStart();
+        setStartImage();
     </script>
 </body>
 </html>
